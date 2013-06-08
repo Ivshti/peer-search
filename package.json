@@ -1,7 +1,7 @@
 {
-  "name": "peer-wire-swarm",
-  "version": "0.0.7",
-  "description": "a peer swarm implementation that uses the torrent DHT to find peers",
+  "name": "bittorrent-dht",
+  "version": "0.0.8",
+  "description": "a lightweight, optimized implementation of the BitTorrent DHT",
   "dependencies": {
     "bncode": "~0.2.3",
     "once": "~1.1.1",
