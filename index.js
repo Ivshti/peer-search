@@ -115,7 +115,7 @@ DHT.prototype.query = function(addr) {
 	if (Object.keys(this.nodes).length > MAX_NODES) return;
 	
 	var self = this,
-		sendMessage = function(cb) { self.socket.send(self.message, 0, self.message.length, addr.split(':')[1], addr.split(':')[0], cb) }; 
+		sendMessage = function(cb) { self.socket && self.socket.send(self.message, 0, self.message.length, addr.split(':')[1], addr.split(':')[0], cb) }; 
 	this.parallelLimit.push(sendMessage, function() { });
 };
 
