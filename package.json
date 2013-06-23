@@ -4,7 +4,6 @@
   "description": "a lightweight, optimized implementation of the BitTorrent DHT",
   "dependencies": {
     "bncode": "~0.2.3",
-    "once": "~1.1.1",
     "compact2string": "~1.0.0",
     "bagpipe": "0.3.0"
   }

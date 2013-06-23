@@ -1,5 +1,4 @@
 var net = require('net');
-var once = require('once');
 var dgram = require('dgram');
 var bncode = require('bncode');
 var crypto = require('crypto');
