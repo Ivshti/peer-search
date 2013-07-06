@@ -85,9 +85,11 @@ var DHT = function(infoHash) {
     this.stop = function()
     {
         delete pendingRequests[self.requestId];
-        if (Object.keys(pendingRequests).length) return;
-        self.socket && self.socket.close();
-        self.socket = socket = null;           
+        self.socket = null; // quit that anyway
+        
+        if (Object.keys(pendingRequests).length) return; // don't close the GLOBAL socket if we still have pending requests
+        socket && socket.close();
+        socket = null;           
     };
     
 	this.socket = socket = socket || dgram.createSocket('udp4');
