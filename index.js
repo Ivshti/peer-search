@@ -48,11 +48,11 @@ var parsePeerInfo = function(list) {
 	}
 };
 
-var socket,	requestId = 0, initialNodes = [];
+var socket,	requestId = 0, initialNodes = [], pendingRequests = { };
 
 var DHT = function(infoHash) {
 	EventEmitter.call(this);
-
+    
 	var self = this;
 	var node = function(addr) {
 		initialNodes.push(addr);
@@ -80,8 +80,12 @@ var DHT = function(infoHash) {
 	this.message = bncode.encode({t:this.requestId.toString(),y:'q',q:'get_peers',a:{id:this.nodeId,info_hash:this.infoHash}});
 	this.parallelLimit = new bagpipe(MAX_PARALLEL);
     
+    pendingRequests[self.requestId] = 1;
+    
     this.stop = function()
     {
+        delete pendingRequests[self.requestId];
+        if (Object.keys(pendingRequests).length) return;
         self.socket && self.socket.close();
         self.socket = socket = null;           
     };
