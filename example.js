@@ -3,6 +3,7 @@ var DHT = require('./');
 var async = require('async');
 
 async.eachSeries(
+//async.each(
     [
         'e756b6ed7f1f647db2ea7e153e2fdc6226218a1f',
      //   'e756b6ed7f1f647db2ea7e153e2fdc6226218a1f',
@@ -19,7 +20,8 @@ async.eachSeries(
             
             if (peers.length != 300) return;
             console.log("\n\n\nready: "+(Date.now() - start)+"\n\n"); // 2 - 3 seconds
-            setTimeout(callback, 4000);
+            //setTimeout(callback, 4000);
+            callback();
         });
     }
 );

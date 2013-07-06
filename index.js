@@ -64,7 +64,7 @@ var DHT = function(infoHash) {
 		if (self.peers[addr]) return;
 		self.peers[addr] = true;
 		self.missing = Math.max(0, self.missing-1);
-		self.emit('peer', addr);
+		process.nextTick(function() { self.emit('peer', addr) }); // if the query is satisfied now, the socket must be closed before a new query is started
 	};
 
 	this.nodes = {};
@@ -79,7 +79,13 @@ var DHT = function(infoHash) {
 	this.requestId = ++requestId;
 	this.message = bncode.encode({t:this.requestId.toString(),y:'q',q:'get_peers',a:{id:this.nodeId,info_hash:this.infoHash}});
 	this.parallelLimit = new bagpipe(MAX_PARALLEL);
-
+    
+    this.stop = function()
+    {
+        self.socket && self.socket.close();
+        self.socket = socket = null;           
+    };
+    
 	this.socket = socket = socket || dgram.createSocket('udp4');
 	this.socket.on('message', function(message, remote) {
 		self.nodes[remote.address+':'+remote.port] = true;
@@ -99,12 +105,8 @@ var DHT = function(infoHash) {
 
 		parsePeerInfo(values).forEach(peer);
 		parseNodeInfo(nodes).forEach(node);
-		
-		if (! this.missing) {
-			// the actual socket has to be closed, in order to prevent the additional incoming traffic from responses of past queries
-			this.socket && this.socket.close();
-			this.socket = socket = null;
-		}
+
+		if (! self.missing) self.stop();
 	});
 };
 
@@ -121,12 +123,7 @@ DHT.prototype.query = function(addr) {
 DHT.prototype.findPeers = function(num, timeout) {
 	this.missing += (num || 1);
 	while (this.queue.length) this.query(this.queue.pop());
-	
-	var self = this;
-	timeout && setTimeout(function() { 
-		self.socket && self.socket.close();
-		self.socket = socket = null;
-	}, timeout);
+	timeout && setTimeout(this.stop, timeout);
 };
 
 DHT.prototype.close = function() {
