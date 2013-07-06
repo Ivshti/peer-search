@@ -21,6 +21,5 @@ async.eachSeries(
             console.log("\n\n\nready: "+(Date.now() - start)+"\n\n"); // 2 - 3 seconds
             setTimeout(callback, 4000);
         });
-
     }
 );
