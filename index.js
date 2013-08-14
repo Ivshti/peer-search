@@ -48,7 +48,8 @@ var parsePeerInfo = function(list) {
 	}
 };
 
-var socket,	requestId = 0, initialNodes = [], pendingRequests = { };
+var socket,
+    requestId = 0, initialNodes = [], pendingRequests = { };
 
 var DHT = function(infoHash) {
 	EventEmitter.call(this);
@@ -82,26 +83,14 @@ var DHT = function(infoHash) {
     
     pendingRequests[self.requestId] = 1;
     
-    this.stop = function()
-    {
-        delete pendingRequests[self.requestId];
-        self.socket = null; // quit that anyway
+    socket = socket || dgram.createSocket('udp4'); // initialize socket only when we need it
         
-        if (Object.keys(pendingRequests).length) return; // don't close the GLOBAL socket if we still have pending requests
-        socket && socket.close();
-        socket = null;           
-    };
-    
-	this.socket = socket = socket || dgram.createSocket('udp4');
-	this.socket.on('message', function(message, remote) {
+    var handleMessage = function(message, remote) {
 		self.nodes[remote.address+':'+remote.port] = true;
 
-		try {
-			message = bncode.decode(message);
-		} catch (err) {
-			return;
-		}
-	
+		try { message = bncode.decode(message); }
+        catch (err) { return; }
+
 		if (! (message.t.toString() == self.requestId))
 			return;
 			
@@ -112,8 +101,19 @@ var DHT = function(infoHash) {
 		parsePeerInfo(values).forEach(peer);
 		parseNodeInfo(nodes).forEach(node);
 
-		if (! self.missing) self.stop();
-	});
+        if (! self.missing) self.stop();
+	};
+    
+    self.stop = function()
+    {
+        delete pendingRequests[self.requestId];
+        socket && socket.removeListener('message', handleMessage);
+        
+        if (Object.keys(pendingRequests).length) return; // don't close the socket if we still have pending requests
+        self.close();
+    };
+
+	socket.on('message', handleMessage);
 };
 
 DHT.prototype.__proto__ = EventEmitter.prototype;
@@ -122,7 +122,7 @@ DHT.prototype.query = function(addr) {
 	if (Object.keys(this.nodes).length > MAX_NODES) return;
 	
 	var self = this,
-		sendMessage = function(cb) { self.socket && self.socket.send(self.message, 0, self.message.length, addr.split(':')[1], addr.split(':')[0], cb) }; 
+		sendMessage = function(cb) { socket && socket.send(self.message, 0, self.message.length, addr.split(':')[1], addr.split(':')[0], cb) }; 
 	this.parallelLimit.push(sendMessage, function() { });
 };
 
@@ -133,7 +133,8 @@ DHT.prototype.findPeers = function(num, timeout) {
 };
 
 DHT.prototype.close = function() {
-	this.socket.close();
+	socket && socket.close();
+    socket = null;
 };
 
 DHT.prototype.__defineGetter__('peersFound', function() { return Object.keys(this.peers).length });
