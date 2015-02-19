@@ -2,16 +2,15 @@ var net = require('net');
 var dgram = require('dgram');
 var bncode = require('bncode');
 var crypto = require('crypto');
-var bagpipe = require('bagpipe');
 var fs = require('fs');
 var compact2string = require('compact2string');
 var EventEmitter = require('events').EventEmitter;
+var RateLimiter = require('limiter').RateLimiter;
 
 var CONNECTION_TIMEOUT = 10000;
 var HANDSHAKE_TIMEOUT = 5000;
 var RECONNECT = 5000;
 var MAX_NODES = 5000;
-var MAX_PARALLEL = 10;
 var BOOTSTRAP_NODES = [
 	'dht.transmissionbt.com:6881',
 	'router.bittorrent.com:6881',
@@ -70,8 +69,9 @@ var DHT = function(infoHash) {
 
 	this.nodes = {};
 	this.peers = {};
+	this.queue = [].concat(BOOTSTRAP_NODES);	
 	//this.queue = [].concat(BOOTSTRAP_NODES);
-	this.queue = initialNodes.length ? [].concat(initialNodes.slice( initialNodes.length - MAX_PARALLEL )) : [].concat(BOOTSTRAP_NODES);
+	//this.queue = initialNodes.length ? [].concat(initialNodes.slice( initialNodes.length - MAX_PARALLEL )) : [].concat(BOOTSTRAP_NODES);
 	//this.queue = initialNodes.length ? [].concat(initialNodes/*.slice( initialNodes.length - 10 )*/) : [].concat(BOOTSTRAP_NODES);
 	this.nodesCount = 0;
 	this.missing = 0;
@@ -79,8 +79,8 @@ var DHT = function(infoHash) {
 	this.nodeId = randomId();
 	this.requestId = ++requestId;
 	this.message = bncode.encode({t:this.requestId.toString(),y:'q',q:'get_peers',a:{id:this.nodeId,info_hash:this.infoHash}});
-	this.parallelLimit = new bagpipe(MAX_PARALLEL);
-    
+    this.limiter = new RateLimiter(100, "second"); // seems fair. will change in future
+
     pendingRequests[self.requestId] = 1;
     
     socket = socket || dgram.createSocket('udp4'); // initialize socket only when we need it
@@ -123,7 +123,10 @@ DHT.prototype.query = function(addr) {
 	
 	var self = this,
 		sendMessage = function(cb) { socket && socket.send(self.message, 0, self.message.length, addr.split(':')[1], addr.split(':')[0], cb) }; 
-	this.parallelLimit.push(sendMessage, function() { });
+
+	self.limiter.removeTokens(1, function() {
+		socket && socket.send(self.message, 0, self.message.length, addr.split(':')[1], addr.split(':')[0]);
+	});
 };
 
 DHT.prototype.findPeers = function(num, timeout) {
