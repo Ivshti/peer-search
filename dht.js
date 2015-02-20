@@ -50,6 +50,10 @@ var socket, requestId = 0, pendingRequests = { };
 var DHT = function(infoHash, opts) {
 	EventEmitter.call(this);
     
+    opts = opts || {};
+    opts.cooloff_time = opts.cooloff_time || COOLOFF;
+    opts.cooloff_requests = opts.cooloff_requests || MAX_REQUESTS;
+
 	var self = this;
 	var node = function(addr) {
 		if (self.nodes[addr]) return;
@@ -102,7 +106,7 @@ var DHT = function(infoHash, opts) {
 		} catch(e) { console.error(e) };
 
 		reqs++;
-		if (reqs>MAX_REQUESTS) return setTimeout(function() { reqs=0; cb() }, COOLOFF);
+		if (reqs>self.cooloff_requests) return setTimeout(function() { reqs=0; cb() }, self.cooloff_time);
 		else setTimeout(cb, 0);
 	};
 
