@@ -17,7 +17,6 @@ async.eachSeries(
         var peers = [], start = Date.now(), i = 0;
         dht.on('peer', function(peer) {
             peers.push(peer);
-            console.log(peers.length)
             if (peers.length != 300) return;
 
             dht.pause();

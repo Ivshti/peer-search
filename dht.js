@@ -6,7 +6,9 @@ var async = require('async');
 var compact2string = require('compact2string');
 var EventEmitter = require('events').EventEmitter;
 
-var REQ_INTERVAL = 15; // 15ms
+var MAX_REQUESTS = 200;
+var COOLOFF = 100;
+
 var BOOTSTRAP_NODES = [
 	'dht.transmissionbt.com:6881',
 	'router.bittorrent.com:6881',
@@ -92,20 +94,22 @@ var DHT = function(infoHash, opts) {
 	};
 	socket.on('message', handleMessage);
 
+	var reqs = 0;
 	function runQueue(addr, cb) {
 		//if (Object.keys(self.nodes).length > 500) { self.queue.pause(); return cb(); }
-		//console.log(addr);
 		try {
 			socket && socket.send(self.message, 0, self.message.length, addr.split(':')[1], addr.split(':')[0]);
 		} catch(e) { console.error(e) };
 
-		setTimeout(cb, REQ_INTERVAL);
+		reqs++;
+		if (reqs>MAX_REQUESTS) return setTimeout(function() { reqs=0; cb() }, COOLOFF);
+		else setTimeout(cb, 0);
 	};
 
     self.run = function() 
     {
-    	BOOTSTRAP_NODES.forEach(function(addr) { self.queue.push(addr) });
     	self.queue.resume();
+    	BOOTSTRAP_NODES.forEach(function(addr) { self.queue.push(addr) });
     };
 
     self.pause = function()
