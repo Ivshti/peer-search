@@ -1,7 +1,7 @@
 {
-  "name": "bittorrent-dht",
+  "name": "peer-search",
   "version": "0.1.1",
-  "description": "a lightweight, optimized implementation of the BitTorrent DHT",
+  "description": "a lightweight, optimized implementation of BitTorrent-compatible DHT; currently only doing queries",
   "dependencies": {
     "bncode": "~0.2.3",
     "compact2string": "~1.0.0",

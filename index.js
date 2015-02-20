@@ -121,11 +121,10 @@ DHT.prototype.__proto__ = EventEmitter.prototype;
 DHT.prototype.query = function(addr) {
 	if (Object.keys(this.nodes).length > MAX_NODES) return;
 	
-	var self = this,
-		sendMessage = function(cb) { socket && socket.send(self.message, 0, self.message.length, addr.split(':')[1], addr.split(':')[0], cb) }; 
-
 	self.limiter.removeTokens(1, function() {
-		socket && socket.send(self.message, 0, self.message.length, addr.split(':')[1], addr.split(':')[0]);
+		try {
+			socket && socket.send(self.message, 0, self.message.length, addr.split(':')[1], addr.split(':')[0]);
+		} catch(e) { console.error(e) };
 	});
 };
 
