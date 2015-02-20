@@ -16,6 +16,7 @@ module.exports = function peerSearch(sources, swarm, options)
 	var running = false;
 	this.run = function() { running=true; sources.forEach(function(x) { x.run() }) };
 	this.pause = function() { running=false; sources.forEach(function(x) { x.pause() }) };
+	this.close = function() { sources.forEach(function(x) { if (x.close) x.close() }) };
 
 	this.run(); // All sources should be initialized paused
 
