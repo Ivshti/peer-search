@@ -9,7 +9,9 @@ module.exports = function peerSearch(sources, swarm, options)
 	var sources = sources.map(function setupSource(src) {
 		if (src.match("^dht:")) return new DHT(new Buffer(src.split(":")[1],"hex"), options);
 		if (src.match("^pump:")) return new Pump(src.split(":")[1]);
-	}).filter(function(x){ return x });
+	})
+	.filter(function(x){ return x });
+	sources.forEach(function(x) { x.on("peer", function(addr) { swarm.add(addr) }) });
 
 	var running = false;
 	this.run = function() { running=true; sources.forEach(function(x) { x.run() }) };
