@@ -9,6 +9,8 @@ module.exports = function peerSearch(sources, swarm, options)
 	var sources = sources.map(function setupSource(src) {
 		if (src.match("^dht:")) return new DHT(new Buffer(src.split(":")[1],"hex"), options);
 		if (src.match("^pump:")) return new Pump(src.slice("pump:".length));
+		//if (src.match("^tracker:")) return new Tracker(src.slice("tracker:".length));
+		// TODO: tracker // bittorrent-tracker
 	})
 	.filter(function(x){ return x });
 	sources.forEach(function(x) { x.on("peer", function(addr) { swarm.add(addr) }) });
@@ -27,5 +29,4 @@ module.exports = function peerSearch(sources, swarm, options)
 	};
 	swarm.on("wire", update);
 	swarm.on("wire-disconnect", update);
-
 };
