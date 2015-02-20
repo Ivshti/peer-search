@@ -3,7 +3,7 @@ var byline = require("byline");
 var EventEmitter = require('events').EventEmitter;
 
 
-module.exports = function Pump(url)
+function Pump(url)
 {
 	var self = this;
 	EventEmitter.call(this);
@@ -17,3 +17,4 @@ module.exports = function Pump(url)
 	};
 };
 Pump.prototype.__proto__ = EventEmitter.prototype;
+module.exports = Pump;
