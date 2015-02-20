@@ -121,6 +121,7 @@ DHT.prototype.__proto__ = EventEmitter.prototype;
 DHT.prototype.query = function(addr) {
 	if (Object.keys(this.nodes).length > MAX_NODES) return;
 	
+	var self = this;
 	self.limiter.removeTokens(1, function() {
 		try {
 			socket && socket.send(self.message, 0, self.message.length, addr.split(':')[1], addr.split(':')[0]);
@@ -139,9 +140,6 @@ DHT.prototype.close = function() {
     socket = null;
 };
 
-DHT.prototype.__defineGetter__('peersFound', function() { return Object.keys(this.peers).length });
-DHT.prototype.__defineGetter__('nodesFound', function() { return Object.keys(this.nodes).length });
-DHT.prototype.__defineGetter__('queued', function() { return 0 }); //TODO
 
 module.exports = DHT;
 
