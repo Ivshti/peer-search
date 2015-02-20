@@ -2,15 +2,11 @@ var net = require('net');
 var dgram = require('dgram');
 var bncode = require('bncode');
 var crypto = require('crypto');
-var fs = require('fs');
+var async = require('async');
 var compact2string = require('compact2string');
 var EventEmitter = require('events').EventEmitter;
-var RateLimiter = require('limiter').RateLimiter;
 
-var CONNECTION_TIMEOUT = 10000;
-var HANDSHAKE_TIMEOUT = 5000;
-var RECONNECT = 5000;
-var MAX_NODES = 5000;
+var REQ_INTERVAL = 15; // 15ms
 var BOOTSTRAP_NODES = [
 	'dht.transmissionbt.com:6881',
 	'router.bittorrent.com:6881',
@@ -47,45 +43,38 @@ var parsePeerInfo = function(list) {
 	}
 };
 
-var socket,
-    requestId = 0, initialNodes = [], pendingRequests = { };
+var socket, requestId = 0, pendingRequests = { };
 
-var DHT = function(infoHash) {
+var DHT = function(infoHash, opts) {
 	EventEmitter.call(this);
     
 	var self = this;
 	var node = function(addr) {
-		initialNodes.push(addr);
 		if (self.nodes[addr]) return;
-		if (self.missing) return self.query(addr);
-		if (self.queue.length < 50) self.queue.push(addr);
+		//if (self.queue.length < 50) self.queue.push(addr);
+		self.queue.push(addr);
 	};
 	var peer = function(addr) {
-		if (self.peers[addr]) return;
+		if (self.peers[addr]) return; // WARNING: we could do something with repeating peers. prioritize?
 		self.peers[addr] = true;
-		self.missing = Math.max(0, self.missing-1);
 		process.nextTick(function() { self.emit('peer', addr) }); // if the query is satisfied now, the socket must be closed before a new query is started
 	};
 
 	this.nodes = {};
 	this.peers = {};
-	this.queue = [].concat(BOOTSTRAP_NODES);	
-	//this.queue = [].concat(BOOTSTRAP_NODES);
-	//this.queue = initialNodes.length ? [].concat(initialNodes.slice( initialNodes.length - MAX_PARALLEL )) : [].concat(BOOTSTRAP_NODES);
-	//this.queue = initialNodes.length ? [].concat(initialNodes/*.slice( initialNodes.length - 10 )*/) : [].concat(BOOTSTRAP_NODES);
-	this.nodesCount = 0;
-	this.missing = 0;
+	this.queue = async.queue(runQueue, 1);
+	this.queue.pause();
+
 	this.infoHash = infoHash;
 	this.nodeId = randomId();
 	this.requestId = ++requestId;
 	this.message = bncode.encode({t:this.requestId.toString(),y:'q',q:'get_peers',a:{id:this.nodeId,info_hash:this.infoHash}});
-    this.limiter = new RateLimiter(100, "second"); // seems fair. will change in future
 
     pendingRequests[self.requestId] = 1;
     
     socket = socket || dgram.createSocket('udp4'); // initialize socket only when we need it
         
-    var handleMessage = function(message, remote) {
+    function handleMessage(message, remote) {
 		self.nodes[remote.address+':'+remote.port] = true;
 
 		try { message = bncode.decode(message); }
@@ -100,10 +89,31 @@ var DHT = function(infoHash) {
 
 		parsePeerInfo(values).forEach(peer);
 		parseNodeInfo(nodes).forEach(node);
-
-        if (! self.missing) self.stop();
 	};
-    
+	socket.on('message', handleMessage);
+
+	function runQueue(addr, cb) {
+		//if (Object.keys(self.nodes).length > 500) { self.queue.pause(); return cb(); }
+		//console.log(addr);
+		try {
+			socket && socket.send(self.message, 0, self.message.length, addr.split(':')[1], addr.split(':')[0]);
+		} catch(e) { console.error(e) };
+
+		setTimeout(cb, REQ_INTERVAL);
+	};
+
+    self.run = function() 
+    {
+    	BOOTSTRAP_NODES.forEach(function(addr) { self.queue.push(addr) });
+    	self.queue.resume();
+    };
+
+    self.pause = function()
+    {
+    	self.queue.pause();
+    };
+
+    // Revise?
     self.stop = function()
     {
         delete pendingRequests[self.requestId];
@@ -112,28 +122,9 @@ var DHT = function(infoHash) {
         if (Object.keys(pendingRequests).length) return; // don't close the socket if we still have pending requests
         self.close();
     };
-
-	socket.on('message', handleMessage);
 };
 
 DHT.prototype.__proto__ = EventEmitter.prototype;
-
-DHT.prototype.query = function(addr) {
-	if (Object.keys(this.nodes).length > MAX_NODES) return;
-	
-	var self = this;
-	self.limiter.removeTokens(1, function() {
-		try {
-			socket && socket.send(self.message, 0, self.message.length, addr.split(':')[1], addr.split(':')[0]);
-		} catch(e) { console.error(e) };
-	});
-};
-
-DHT.prototype.findPeers = function(num, timeout) {
-	this.missing += (num || 1);
-	while (this.queue.length) this.query(this.queue.pop());
-	timeout && setTimeout(this.stop, timeout);
-};
 
 DHT.prototype.close = function() {
 	socket && socket.close();
