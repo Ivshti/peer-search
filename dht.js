@@ -49,10 +49,10 @@ var socket, requestId = 0, pendingRequests = { };
 
 var DHT = function(infoHash, opts) {
 	EventEmitter.call(this);
-    
-    opts = opts || {};
-    opts.cooloff_time = opts.cooloff_time || COOLOFF;
-    opts.cooloff_requests = opts.cooloff_requests || MAX_REQUESTS;
+	
+	opts = opts || {};
+	opts.cooloff_time = opts.cooloff_time || COOLOFF;
+	opts.cooloff_requests = opts.cooloff_requests || MAX_REQUESTS;
 
 	var self = this;
 	var node = function(addr) {
@@ -76,15 +76,15 @@ var DHT = function(infoHash, opts) {
 	this.requestId = ++requestId;
 	this.message = bncode.encode({t:this.requestId.toString(),y:'q',q:'get_peers',a:{id:this.nodeId,info_hash:this.infoHash}});
 
-    pendingRequests[self.requestId] = 1;
-    
-    socket = socket || dgram.createSocket('udp4'); // initialize socket only when we need it
-        
-    function handleMessage(message, remote) {
+	pendingRequests[self.requestId] = 1;
+	
+	socket = socket || dgram.createSocket('udp4'); // initialize socket only when we need it
+		
+	function handleMessage(message, remote) {
 		self.nodes[remote.address+':'+remote.port] = true;
 
 		try { message = bncode.decode(message); }
-        catch (err) { return; }
+		catch (err) { return; }
 
 		if (! (message.t.toString() == self.requestId))
 			return;
@@ -110,33 +110,33 @@ var DHT = function(infoHash, opts) {
 		else setTimeout(cb, 0);
 	};
 
-    self.run = function() 
-    {
-    	self.queue.resume();
-    	BOOTSTRAP_NODES.forEach(function(addr) { self.queue.push(addr) });
-    };
+	self.run = function() 
+	{
+		self.queue.resume();
+		BOOTSTRAP_NODES.forEach(function(addr) { self.queue.push(addr) });
+	};
 
-    self.pause = function()
-    {
-    	self.queue.pause();
-    };
+	self.pause = function()
+	{
+		self.queue.pause();
+	};
 
-    // Revise?
-    self.stop = function()
-    {
-        delete pendingRequests[self.requestId];
-        socket && socket.removeListener('message', handleMessage);
-        
-        if (Object.keys(pendingRequests).length) return; // don't close the socket if we still have pending requests
-        self.close();
-    };
+	// Revise?
+	self.stop = function()
+	{
+		delete pendingRequests[self.requestId];
+		socket && socket.removeListener('message', handleMessage);
+		
+		if (Object.keys(pendingRequests).length) return; // don't close the socket if we still have pending requests
+		self.close();
+	};
 };
 
 DHT.prototype.__proto__ = EventEmitter.prototype;
 
 DHT.prototype.close = function() {
 	socket && socket.close();
-    socket = null;
+	socket = null;
 };
 
 
