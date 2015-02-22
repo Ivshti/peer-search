@@ -1,4 +1,3 @@
-
 var DHT = require('./dht');
 var async = require('async');
 
@@ -26,3 +25,10 @@ async.eachSeries(
         });
     }
 );
+
+/*
+var Tracker = require("./tracker");
+var tracker = new Tracker("TRACKER URL", {}, "INFO HASH");
+tracker.run();
+tracker.on("peer",function(addr){console.log(addr)})
+*/

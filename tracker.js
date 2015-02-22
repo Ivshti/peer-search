@@ -19,5 +19,5 @@ function Tracker(url, options, infoHash)
 		// No point
 	};
 };
-Pump.prototype.__proto__ = EventEmitter.prototype;
+Tracker.prototype.__proto__ = EventEmitter.prototype;
 module.exports = Tracker;
