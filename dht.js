@@ -86,7 +86,7 @@ var DHT = function(infoHash, opts) {
 		try { message = bncode.decode(message); }
 		catch (err) { return; }
 
-		if (! (message.t.toString() == self.requestId))
+		if (!message.t || (message.t.toString() != self.requestId))
 			return;
 			
 		var r = message && message.r;
