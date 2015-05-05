@@ -29,4 +29,11 @@ module.exports = function peerSearch(sources, swarm, options)
 	};
 	swarm.on("wire", update);
 	swarm.on("wire-disconnect", update);
+
+	// if needed we can use swarm._destroyed ?
+	swarm.on("close", function() {
+		swarm.removeAllListeners();
+		self.pause(); 
+		self.close(); sources = [];
+	});	
 };
