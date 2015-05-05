@@ -2,6 +2,7 @@
 var DHT = require('./dht');
 var async = require('async');
 
+/*
 async.eachSeries(
 //async.each(
     [
@@ -26,3 +27,10 @@ async.eachSeries(
         });
     }
 );
+*/
+
+
+var Tracker = require("./tracker");
+var tracker = new Tracker("udp://tracker.openbittorrent.com:80/announce", {}, "89e3d46d609b122a4782fe6eb269823a1ff18a74");
+tracker.run();
+tracker.on("peer",function(addr){console.log(addr)})
