@@ -1,6 +1,6 @@
 var request = require("request");
 var byline = require("byline");
-var EventEmitter = require('events').EventEmitter;
+var EventEmitter = require("events").EventEmitter;
 
 
 function Pump(url)
