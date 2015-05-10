@@ -24,7 +24,7 @@ module.exports = function peerSearch(sources, swarm, options)
 	this.run(); // All sources should be initialized paused
 
 	var update = function() {
-		var len = swam.queued;
+		var len = swarm.queued;
 		if (options.hasOwnProperty("min") && (len < options.min) && !running) return self.run();
 		if (options.hasOwnProperty("max") && (len > options.max) && running) return self.pause();
 	};
