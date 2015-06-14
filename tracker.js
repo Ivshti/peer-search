@@ -155,7 +155,13 @@ function getTorrentInfoHTTP(tracker, infoHash, ready)
         tracker.search += key +"=" + tracker.query[key] + "&";
     }
     needle.get(require("url").format(tracker), function(err, resp) {
-        if (resp && resp.body) console.log(bncode.decode(resp.body))
+        if (err) return ready(err);
+        if (! (resp && resp.raw)) return ready(new Error("blank response"));
+        try { 
+            var resp = bncode.decode(resp.raw);
+            resp.peers = resp.peers.map(function(p) { return new Buffer(p.ip).toString()+":"+p.port });
+            ready(null, resp);
+        } catch(e) { ready(e) };
     });
 }
 
