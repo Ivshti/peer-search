@@ -7,7 +7,7 @@
     "compact2string": "~1.0.0",
     "async": "0.9.x",
     "byline": "3.1.2",
-    "request": "2.16.x",
+    "needle": "0.9.x",
     "hat": "0.0.3"
   }
 }

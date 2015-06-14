@@ -1,4 +1,4 @@
-var request = require("request");
+var needle = require("needle");
 var byline = require("byline");
 var EventEmitter = require("events").EventEmitter;
 var async = require("async");
@@ -13,7 +13,7 @@ function Pump(url)
 	var refreshInterval = null;
 	
 	this.run = function() {
-		 byline(request(url)).on("data", function(d) { self.emit("peer",d.toString()) });
+		 byline(needle.get(url)).on("data", function(d) { self.emit("peer",d.toString()) });
 		 if (!refreshInterval) refreshInterval = setInterval(function() { self.run()  }, REFRESH_INTERVAL);
 	};
 
