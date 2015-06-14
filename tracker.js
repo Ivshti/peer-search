@@ -1,6 +1,7 @@
 var dgram = require("dgram");
 var hat = require("hat");
 var EventEmitter = require("events").EventEmitter;
+var bncode = require("bncode");
 
 var BufferUtils = require("./bufferutils");
 
@@ -141,6 +142,22 @@ var getTorrentInfo = function(tracker, infoHash, cb)
     
 };
 
+function getTorrentInfoHTTP(tracker, infoHash, ready)
+{
+    tracker.query.info_hash = escape(infoHash.toString("binary"));
+    tracker.query.peer_id = escape(new Buffer('-PF0005-'+hat(48)).toString()),
+    tracker.query.port = 10000; // something?
+    tracker.query.uploaded = 0;
+    tracker.query.downloaded = 0;
+    tracker.query.event = "started";
+    tracker.search = "?";
+    for (key in tracker.query) {
+        tracker.search += key +"=" + tracker.query[key] + "&";
+    }
+    needle.get(require("url").format(tracker), function(err, resp) {
+        if (resp && resp.body) console.log(bncode.decode(resp.body))
+    });
+}
 
 function Tracker(url, options, infoHash)
 {
@@ -148,12 +165,14 @@ function Tracker(url, options, infoHash)
     EventEmitter.call(this);
 
     this.run = function() {
-        var tracker = require("url").parse(url);
-        tracker.port = parseInt(tracker.port);
-        getTorrentInfo(tracker, infoHash, function(err, inf) { 
+        var ready = function(err, inf) { 
             if (err) console.error(err);
             if (inf && inf.peers) inf.peers.forEach(function(p) { self.emit("peer", p) }) 
-        });
+        };
+        var tracker = require("url").parse(url, true);
+        if (tracker.protocol.match("^http")) return getTorrentInfoHTTP(tracker, infoHash, ready);
+        tracker.port = parseInt(tracker.port);
+        getTorrentInfo(tracker, infoHash, ready);
     };
 
     this.pause = function() {
