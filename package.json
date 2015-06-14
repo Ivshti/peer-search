@@ -1,6 +1,6 @@
 {
   "name": "peer-search",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "discover peers for torrent-engine",
   "dependencies": {
     "bncode": "~0.2.3",
