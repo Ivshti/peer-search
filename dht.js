@@ -6,8 +6,8 @@ var async = require('async');
 var compact2string = require('compact2string');
 var EventEmitter = require('events').EventEmitter;
 
-var MAX_REQUESTS = 35;
-var COOLOFF = 10;
+var MAX_REQUESTS = 32;
+var COOLOFF = 12;
 
 var BOOTSTRAP_NODES = [
 	'dht.transmissionbt.com:6881',
