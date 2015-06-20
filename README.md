@@ -1,6 +1,12 @@
 # peer-search
 
-Peer discovery for peer-wire-swarm. Can use DHT, peer pumps (HTTP request that streams a list of peers). Planned support for trackers.
+Peer discovery for peer-wire-swarm. 
+
+Supports
+* DHT
+* UDP trackers
+* HTTP trackers
+* HTTP URL to a line-separated list of peer IPs; keeps the request open until the server closes it, since the result is parsed line by line and directly added to the peer-wire-swarm
 
 Basic example
 ```javascript
