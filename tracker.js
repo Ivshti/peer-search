@@ -54,7 +54,9 @@ var getTorrentInfo = function(tracker, infoHash, cb)
     function send(packet)
     {
         var req = requests[getTransactionId.last.toString("hex")] = { id: getTransactionId.last.toString("hex") };
-        socket.send(packet, 0, packet.length, tracker.port, tracker.hostname, function(err) { err && console.error("torrentInfo - sending packets", err) });
+        try {
+          socket.send(packet, 0, packet.length, tracker.port, tracker.hostname, function(err) { err && console.error("tracker", err) });
+        } catch(e) { console.error("tracker",e);  }
         return req;
     };
     
