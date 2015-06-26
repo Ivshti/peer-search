@@ -161,7 +161,7 @@ function getTorrentInfoHTTP(tracker, infoHash, ready)
         if (! (resp && resp.raw)) return ready(new Error("blank response"));
         try { 
             var resp = bncode.decode(resp.raw);
-            resp.peers = resp.peers.map(function(p) { return new Buffer(p.ip).toString()+":"+p.port });
+            if (Array.isArray(resp.peers)) resp.peers = resp.peers.map(function(p) { return new Buffer(p.ip).toString()+":"+p.port });
             ready(null, resp);
         } catch(e) { ready(e) };
     });
