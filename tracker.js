@@ -175,7 +175,7 @@ function Tracker(url, options, infoHash)
     this.run = function() {
         var ready = function(err, inf) { 
             if (err) console.error(err);
-            if (inf && inf.peers) inf.peers.forEach(function(p) { self.emit("peer", p) }) 
+            if (inf && Array.isArray(inf.peers)) inf.peers.forEach(function(p) { self.emit("peer", p) }) 
         };
         var tracker = require("url").parse(url, true);
         if (tracker.protocol.match("^http")) return getTorrentInfoHTTP(tracker, infoHash, ready);
