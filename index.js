@@ -13,7 +13,8 @@ module.exports = function peerSearch(sources, swarm, options)
 		if (src.match("^tracker:")) return new Tracker(src.slice("tracker:".length), { }, swarm.infoHash);
 		// TODO: tracker // bittorrent-tracker
 	})
-	.filter(function(x){ return x });
+	.map(function(x, i) { if (x) x.url = sources[i]; return x }) // Attach url to each one
+	.filter(function(x) { return x });
 	sources.forEach(function(x) { 
 		x.numFound = 0;
 		x.on("peer", function(addr) { x.numFound++; swarm.add(addr) });
