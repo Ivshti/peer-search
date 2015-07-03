@@ -27,6 +27,7 @@ module.exports = function peerSearch(sources, swarm, options)
 		if (x.removeAllListeners) x.removeAllListeners();
 		if (x.close) x.close();
 	}) };
+	this.stats = function() { return sources.map(function(x) { return { numFound: x.numFound, url: x.url } }) };
 
 	this.run(); // All sources should be initialized paused
 
