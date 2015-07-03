@@ -36,5 +36,7 @@ module.exports = function peerSearch(sources, swarm, options)
 		swarm.removeAllListeners();
 		self.pause(); 
 		self.close(); sources = [];
-	});	
+	});
+	
+	swarm.peerSearch = self;
 };
