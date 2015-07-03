@@ -14,7 +14,10 @@ module.exports = function peerSearch(sources, swarm, options)
 		// TODO: tracker // bittorrent-tracker
 	})
 	.filter(function(x){ return x });
-	sources.forEach(function(x) { x.on("peer", function(addr) { swarm.add(addr) }) });
+	sources.forEach(function(x) { 
+		x.numFound = 0;
+		x.on("peer", function(addr) { x.numFound++; swarm.add(addr) });
+	});
 
 	var running = false;
 	this.run = function() { running=true; sources.forEach(function(x) { x.run() }) };
