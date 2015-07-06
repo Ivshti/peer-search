@@ -38,6 +38,7 @@ module.exports = function peerSearch(sources, swarm, options)
 	};
 	swarm.on("wire", update);
 	swarm.on("wire-disconnect", update);
+	// TODO: consider calling self.run() (if running) every 25s to re-try some sources
 
 	// if needed we can use swarm._destroyed ?
 	swarm.on("close", function() {
