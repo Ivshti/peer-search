@@ -2,6 +2,7 @@ var dgram = require("dgram");
 var hat = require("hat");
 var EventEmitter = require("events").EventEmitter;
 var bncode = require("bncode");
+var needle = require("needle");
 
 var BufferUtils = require("./bufferutils");
 
