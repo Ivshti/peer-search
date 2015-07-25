@@ -102,6 +102,7 @@ var DHT = function(infoHash, opts) {
 	function runQueue(addr, cb) {
 		//if (Object.keys(self.nodes).length > 500) { self.queue.pause(); return cb(); }
 		try {
+			self.numRequests++;
 			socket && socket.send(self.message, 0, self.message.length, addr.split(':')[1], addr.split(':')[0]);
 		} catch(e) { console.error(e) };
 
