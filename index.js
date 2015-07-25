@@ -16,7 +16,7 @@ module.exports = function peerSearch(sources, swarm, options)
 	.map(function(x, i) { if (x) x.url = sources[i]; return x }) // Attach url to each one
 	.filter(function(x) { return x });
 	sources.forEach(function(x) { 
-		x.numFound = 0;
+		x.numFound = 0; x.numRequests = 0;
 		x.on("peer", function(addr) { x.numFound++; swarm.add(addr) });
 	});
 
@@ -27,7 +27,7 @@ module.exports = function peerSearch(sources, swarm, options)
 		if (x.removeAllListeners) x.removeAllListeners();
 		if (x.close) x.close();
 	}) };
-	this.stats = function() { return sources.map(function(x) { return { numFound: x.numFound, url: x.url } }) };
+	this.stats = function() { return sources.map(function(x) { return { numFound: x.numFound, numRequests: x.numRequests, url: x.url } }) };
 
 	this.run(); // All sources should be initialized paused
 
