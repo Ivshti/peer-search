@@ -6,7 +6,7 @@ var async = require('async');
 var compact2string = require('compact2string');
 var EventEmitter = require('events').EventEmitter;
 
-var MAX_REQUESTS = 30;
+var MAX_REQUESTS = 28;
 var COOLOFF = 15;
 
 var BOOTSTRAP_NODES = [
