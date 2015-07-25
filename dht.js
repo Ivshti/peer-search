@@ -100,6 +100,9 @@ var DHT = function(infoHash, opts) {
 
 	var reqs = 0;
 	function runQueue(addr, cb) {
+		// we can add a wait to the queue
+		if (typeof(addr) == "number") return setTimeout(cb, addr);
+		
 		//if (Object.keys(self.nodes).length > 500) { self.queue.pause(); return cb(); }
 		try {
 			self.numRequests++;
