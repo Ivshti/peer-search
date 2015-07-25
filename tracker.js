@@ -178,6 +178,7 @@ function Tracker(url, options, infoHash)
             if (err) console.error(err);
             if (inf && Array.isArray(inf.peers)) inf.peers.forEach(function(p) { self.emit("peer", p) }) 
         };
+        self.numRequests++;
         var tracker = require("url").parse(url, true);
         if (tracker.protocol.match("^http")) return getTorrentInfoHTTP(tracker, infoHash, ready);
         tracker.port = parseInt(tracker.port);
