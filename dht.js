@@ -79,7 +79,8 @@ var DHT = function(infoHash, opts) {
 	pendingRequests[self.requestId] = 1;
 	
 	socket = socket || dgram.createSocket('udp4'); // initialize socket only when we need it
-		
+	socket.on("error", function(e) { console.error(e) });
+	
 	function handleMessage(message, remote) {
 		self.nodes[remote.address+':'+remote.port] = true;
 
