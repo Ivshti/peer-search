@@ -6,7 +6,7 @@ var needle = require("needle");
 
 var BufferUtils = require("./bufferutils");
 
-var REQUEST_TIMEOUT = 500; // a timeout on an individual UDP announce request
+var REQUEST_TIMEOUT = 1000; // a timeout on an individual UDP announce request
 
 var CONNECTION_ID = BufferUtils.concat(
   BufferUtils.fromInt(0x417), 
@@ -113,6 +113,8 @@ var getTorrentInfo = function(tracker, infoHash, cb)
                     
         var received = false, timeout = setTimeout(function()
         {
+            if (socket) socket.close();
+            
             if (received) return;
             req.callback = null; // ensure that's not called in case our response comes after the timeout
 
@@ -131,6 +133,8 @@ var getTorrentInfo = function(tracker, infoHash, cb)
         
         req.callback = function(msg)
         {
+            if (socket) socket.close();
+        
             clearTimeout(timeout);
             received = true;
 
