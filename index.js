@@ -41,7 +41,7 @@ module.exports = function peerSearch(sources, swarm, options)
 		if (options.hasOwnProperty("max") && (len > options.max) && running) return self.pause();
 	};
 	swarm.on("wire", update); swarm.on("wire-disconnect", update);
-	swarm.on("resume", update); swarm.on("resume", update);
+	swarm.on("resume", update); swarm.on("pause", update);
 	// Call self.run() (if running) every 30s to re-try/boost some sources
 	setInterval(function() { if (running) self.run() }, 30*1000);
 	
