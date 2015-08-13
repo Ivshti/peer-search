@@ -181,6 +181,7 @@ function Tracker(url, options, infoHash)
     this.run = function() {
         var ready = function(err, inf) { 
             if (err) console.error(err);
+            if (inf && inf.uploaders) self.emit("info", inf);
             if (inf && Array.isArray(inf.peers)) inf.peers.forEach(function(p) { self.emit("peer", p) }) 
         };
         self.numRequests++;
