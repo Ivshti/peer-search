@@ -64,7 +64,7 @@ var getTorrentInfo = function(tracker, infoHash, cb)
     var connectCb, connectionId, connect = function(callback)
     {
         socket = dgram.createSocket("udp4", handle).on("error", function(e) { console.error("torrentInfo - creating socket", e.message) });
-        socket.on("error", function(e) { console.error(e); socket.destroy() });
+        socket.on("error", function(e) { console.error(e); if (socket.destroy) socket.destroy() });
         send(BufferUtils.concat(CONNECTION_ID, BufferUtils.fromInt(Action.CONNECT), getTransactionId()));
         connectCb = function(id) { connectionId = id; callback() };
     };
