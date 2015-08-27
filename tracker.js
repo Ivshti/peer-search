@@ -154,7 +154,7 @@ function getTorrentInfoHTTP(tracker, infoHash, ready)
 {
     tracker.query.info_hash = escape(infoHash.toString("binary"));
     tracker.query.peer_id = escape(new Buffer('-PF0005-'+hat(48)).toString()),
-    tracker.query.port = 10000; // something?
+    tracker.query.port = 1111; // something?
     tracker.query.uploaded = 0;
     tracker.query.downloaded = 0;
     tracker.query.event = "started";
