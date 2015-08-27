@@ -45,8 +45,8 @@ function readInt(buffer, offset) {
 
 function fromInt16(int) {
   var b = new Buffer(2);
-  b[2] = int >> 8 & 0xff;
-  b[3] = int & 0xff;
+  b[0] = int >> 8 & 0xff;
+  b[1] = int & 0xff;
   return b;
 }
 
