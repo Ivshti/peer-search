@@ -102,7 +102,7 @@ var getTorrentInfo = function(tracker, infoHash, cb)
           BufferUtils.fromInt(Action.ANNOUNCE), 
           getTransactionId(), data.info_hash, data.peer_id,
           BufferUtils.fromInt(0), BufferUtils.fromInt(data.downloaded || 0), // int64, TODO: split data into two parts etc
-          BufferUtils.fromInt(0), BufferUtils.fromInt(data.left || 0), // 64
+          BufferUtils.fromInt(0), BufferUtils.fromInt(data.left || 16*1024), // 64
           BufferUtils.fromInt(0), BufferUtils.fromInt(data.uploaded || 0), //64
           BufferUtils.fromInt(data.event),
           BufferUtils.fromInt(0), 
