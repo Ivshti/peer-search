@@ -4,6 +4,12 @@ var EventEmitter = require("events").EventEmitter;
 var bncode = require("bncode");
 var needle = require("needle");
 
+// Temporary way to pick a listening port - we'll implement seeding hook / logic here
+var ANNOUNCE_PORT = 1111;
+var server = require("net").createServer(function(req,res){ res.end() }).on("listening", function() {
+  ANNOUNCE_PORT = server.address().port;
+}).listen();
+
 var BufferUtils = require("./bufferutils");
 
 var REQUEST_TIMEOUT = 1000; // a timeout on an individual UDP announce request
@@ -95,7 +101,7 @@ var getTorrentInfo = function(tracker, infoHash, cb)
             event: "started",
             info_hash: new Buffer(infoHash, "hex"),
             peer_id: new Buffer('-PF0005-'+hat(48)),
-            port: 1111 // does not matter
+            port: ANNOUNCE_PORT
         };
 
         var req = send(BufferUtils.concat(connectionId,
@@ -154,7 +160,7 @@ function getTorrentInfoHTTP(tracker, infoHash, ready)
 {
     tracker.query.info_hash = escape(infoHash.toString("binary"));
     tracker.query.peer_id = escape(new Buffer('-PF0005-'+hat(48)).toString()),
-    tracker.query.port = 1111; // something?
+    tracker.query.port = ANNOUNCE_PORT;
     tracker.query.left = 16*1024;
     tracker.query.uploaded = 0;
     tracker.query.downloaded = 0;
