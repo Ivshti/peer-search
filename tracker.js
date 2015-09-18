@@ -6,7 +6,7 @@ var needle = require("needle");
 
 // Temporary way to pick a listening port - we'll implement seeding hook / logic here
 var ANNOUNCE_PORT = 1111;
-var server = require("net").createServer(function(req,res){ res.end() }).on("listening", function() {
+var server = require("net").createServer(function(c){ c.end() }).on("listening", function() {
   ANNOUNCE_PORT = server.address().port;
 }).listen();
 
