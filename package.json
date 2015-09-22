@@ -1,7 +1,7 @@
 {
   "name": "peer-search",
-  "version": "0.6.9",
-  "description": "discover peers for torrent-engine",
+  "version": "0.6.10",
+  "description": "clear re-run interval on stop",
   "dependencies": {
     "bncode": "~0.2.3",
     "compact2string": "~1.0.0",
