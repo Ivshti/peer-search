@@ -22,7 +22,7 @@ module.exports = function peerSearch(sources, swarm, options)
 
 	var running = false;
 	this.run = function() { running=true; sources.forEach(function(x) { 
-		if (sources.length > 2 && x.url.match("^dht")) x.queue.unshift(500); // wait 500ms for the DHT if we have a lot of sources
+		if (sources.length > 2 && x.url.match("^dht")) x.queue.unshift(800); // wait 800ms for the DHT if we have a lot of sources
 		x.run();
 	}) };
 	this.pause = function() { running=false; sources.forEach(function(x) { x.pause() }) };
