@@ -1,13 +1,13 @@
 {
   "name": "peer-search",
-  "version": "0.6.10",
+  "version": "0.6.11",
   "description": "clear re-run interval on stop",
   "dependencies": {
     "bncode": "~0.2.3",
     "compact2string": "~1.0.0",
     "async": "0.9.x",
     "byline": "3.1.2",
-    "needle": "0.9.x",
+    "needle": "Ivshti/needle",
     "hat": "0.0.3"
   }
 }
