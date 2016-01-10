@@ -1,13 +1,10 @@
 {
   "name": "peer-search",
-  "version": "0.6.11",
-  "description": "clear re-run interval on stop",
+  "version": "0.7.0",
+  "description": "Find bittorrent peers intelligently",
   "dependencies": {
-    "bncode": "~0.2.3",
-    "compact2string": "~1.0.0",
     "async": "0.9.x",
-    "byline": "3.1.2",
-    "needle": "Ivshti/needle",
-    "hat": "0.0.3"
+    "bittorrent-dht": "^6.3.0",
+    "bittorrent-tracker": "^7.0.0"
   }
 }
