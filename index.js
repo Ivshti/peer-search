@@ -1,5 +1,4 @@
 var DHT = require("./dht");
-//var Pump = require("./pump");
 var Tracker = require("./tracker");
 var events = require("events");
 
@@ -9,7 +8,6 @@ module.exports = function peerSearch(sources, swarm, options)
 
 	var sources = sources.map(function setupSource(src) {
 		if (src.match("^dht:")) return new DHT(src.split(":")[1], options);
-		//if (src.match("^pump:")) return new Pump(src.slice("pump:.length));
 		if (src.match("^tracker:")) return new Tracker(src.slice("tracker:".length), { }, swarm.infoHash);
 	})
 	.map(function(x, i) { if (x) x.url = sources[i]; return x }) // Attach url to each one
