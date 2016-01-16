@@ -2,7 +2,7 @@ var bittorrentDHT = require('bittorrent-dht')
 var EventEmitter = require('events').EventEmitter
 
 var DHT_WAIT = 1500;
-var DHT_CONCURRENCY = 16; 
+var DHT_CONCURRENCY = 10; 
 
 function DHT(infoHash)
 {
