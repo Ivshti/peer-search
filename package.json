@@ -1,6 +1,6 @@
 {
   "name": "peer-search",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "Find bittorrent peers intelligently",
   "dependencies": {
     "bittorrent-dht": "6.3.x",
