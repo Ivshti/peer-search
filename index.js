@@ -22,13 +22,16 @@ module.exports = function peerSearch(sources, swarm, options)
 		// we can't have this now, because we changed the DHT implementation
 		//if (sources.length > 2 && x.url.match("^dht")) x.queue.unshift(800); // wait 800ms for the DHT if we have a lot of sources
 		x.run();
+		x.lastStarted = new Date();
 	}) };
 	this.pause = function() { running=false; sources.forEach(function(x) { x.pause() }) };
 	this.close = function() { sources.forEach(function(x) { 
 		if (x.removeAllListeners) x.removeAllListeners();
 		if (x.close) x.close();
 	}) };
-	this.stats = function() { return sources.map(function(x) { return { numFound: x.numFound, numRequests: x.numRequests, url: x.url } }) };
+	this.stats = function() {
+		return sources.map(function(x) { return { numFound: x.numFound, numRequests: x.numRequests, url: x.url, lastStarted: x.lastStarted } }) 
+	};
 	this.isRunning = function() { return running };
 
 	this.run(); // All sources should be initialized paused
