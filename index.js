@@ -7,6 +7,7 @@ module.exports = function peerSearch(sources, swarm, options)
 	var self = this;
 
 	var sources = sources.map(function setupSource(src) {
+		if (typeof(src) !== "string") return;
 		if (src.match("^dht:")) return new DHT(src.split(":")[1], options);
 		if (src.match("^tracker:")) return new Tracker(src.slice("tracker:".length), { }, swarm.infoHash);
 	})
