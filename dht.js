@@ -2,7 +2,7 @@ var bittorrentDHT = require('bittorrent-dht')
 var EventEmitter = require('events').EventEmitter
 
 var DHT_WAIT = 1500;
-var DHT_LET_IT_RUN= 1000; // let it run 1000ms after pause; that allows us to 'stock up' on peers, for only one sec
+var DHT_LET_IT_RUN= 1500; // let it run 1500ms after pause; that allows us to 'stock up' on peers, for only one sec
 var DHT_CONCURRENCY = 10; 
 
 function DHT(infoHash)
