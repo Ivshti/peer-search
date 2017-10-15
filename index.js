@@ -6,6 +6,8 @@ module.exports = function peerSearch(sources, swarm, options)
 {
 	var self = this;
 
+	var uniq = { };
+
 	// expose options
 	self.options = options;
 
@@ -17,8 +19,18 @@ module.exports = function peerSearch(sources, swarm, options)
 	.map(function(x, i) { if (x) x.url = sources[i]; return x }) // Attach url to each one
 	.filter(function(x) { return x });
 	sources.forEach(function(x) { 
-		x.numFound = 0; x.numRequests = 0;
-		x.on("peer", function(addr) { x.numFound++; swarm.add(addr) });
+		x.numFound = 0
+		x.numFoundUniq = 0
+		x.numRequests = 0
+
+		x.on("peer", function(addr) {
+			if (! uniq[addr]) {
+				x.numFoundUniq++
+				uniq[addr] = true
+			}
+			x.numFound++
+			swarm.add(addr)
+		});
 	});
 
 	var running = false;
@@ -34,7 +46,13 @@ module.exports = function peerSearch(sources, swarm, options)
 		if (x.close) x.close();
 	}) };
 	this.stats = function() {
-		return sources.map(function(x) { return { numFound: x.numFound, numRequests: x.numRequests, url: x.url, lastStarted: x.lastStarted } }) 
+		return sources.map(function(x) { return { 
+			numFound: x.numFound,
+			numFoundUniq: x.numFoundUniq,
+			numRequests: x.numRequests,
+			url: x.url,
+			lastStarted: x.lastStarted 
+		} }) 
 	};
 	this.isRunning = function() { return running };
 
