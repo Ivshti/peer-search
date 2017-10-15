@@ -17,6 +17,7 @@ function DHT(infoHash)
 		if (abort || wait) return
 
 		wait = setTimeout(function() {
+			self.numRequests++
 			abort = dht.lookup(infoHash)
 			wait = null
 		}, DHT_WAIT);

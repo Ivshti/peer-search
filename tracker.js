@@ -11,6 +11,8 @@ function Tracker(url, opts, infoHash)
     var port = 6881
 
     this.run = function() {
+        self.numRequests++
+        
         var client = new trackerCli(peerId, port, { infoHash: infoHash, announce: [url] })
         client.start()
         client.on('peer', function(addr) { self.emit('peer',addr) })
