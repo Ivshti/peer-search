@@ -1,5 +1,4 @@
 var DHT = require('./dht');
-var async = require('async');
 
 /*
 async.eachSeries(
