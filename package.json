@@ -3,7 +3,7 @@
   "version": "0.8.3",
   "description": "Find bittorrent peers intelligently",
   "dependencies": {
-    "bittorrent-dht": "6.3.x",
+    "bittorrent-dht": "7.8.x",
     "bittorrent-tracker": "7.0.x"
   }
 }
