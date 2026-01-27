@@ -3,14 +3,15 @@ var EventEmitter = require('events').EventEmitter
 
 var DHT_WAIT = 1500;
 var DHT_LET_IT_RUN= 1500; // let it run 1500ms after pause; that allows us to 'stock up' on peers, for only one sec
-var DHT_CONCURRENCY = 10; 
+var DHT_CONCURRENCY = 10;
 
 function DHT(infoHash)
 {
 	var self = this;
 	EventEmitter.call(this);
-	
-	var dht = new bittorrentDHT({ concurrency: DHT_CONCURRENCY });
+
+	this._dht = new bittorrentDHT({ concurrency: DHT_CONCURRENCY });
+	var dht = this._dht;
 	var abort, wait;
 
 	this.run = function() {
@@ -31,4 +32,18 @@ function DHT(infoHash)
 	dht.on('peer', function(p) { self.emit('peer', p.host+":"+p.port) })
 };
 DHT.prototype.__proto__ = EventEmitter.prototype;
+DHT.prototype.close = function () {
+  if (this._closed) return;
+  this._closed = true;
+
+  if (this.pause) this.pause();
+
+  if (this._dht) {
+    this._dht.destroy();
+    this._dht = null;
+  }
+
+  this.removeAllListeners();
+};
+
 module.exports = DHT;
