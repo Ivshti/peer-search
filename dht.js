@@ -28,6 +28,10 @@ function DHT(infoHash)
 		if (abort) { setTimeout(abort, DHT_LET_IT_RUN); abort = null }
 	};
 
+	this.close = function(cb) {
+		dht.destroy(cb);
+	}
+
 	dht.on('peer', function(p) { self.emit('peer', p.host+":"+p.port) })
 };
 DHT.prototype.__proto__ = EventEmitter.prototype;
