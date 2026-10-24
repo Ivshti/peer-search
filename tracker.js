@@ -17,6 +17,7 @@ function resolveAnnounce(announce, cb)
 
     dns.resolve4(host, function(err, ips) {
         var ip = !err && ips && ips.length ? ips[0] : null
+        if (err && err.code !== 'ENOTFOUND' && err.code !== 'ENODATA') ip = host
         hosts[host] = { ip: ip, expires: Date.now() + (ip ? 10 * 60 * 1000 : 60 * 1000) }
         cb(ip ? announce.replace(host, ip) : null)
     })
