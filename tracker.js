@@ -1,5 +1,26 @@
 var trackerCli = require('bittorrent-tracker')
 var EventEmitter = require('events').EventEmitter
+var dns = require('dns')
+var net = require('net')
+var url = require('url')
+
+var hosts = {}
+
+function resolveAnnounce(announce, cb)
+{
+    var parsed = url.parse(announce)
+    var host = parsed.hostname
+    if (parsed.protocol !== 'udp:' || !host || net.isIP(host)) return cb(announce)
+
+    var cached = hosts[host]
+    if (cached && cached.expires > Date.now()) return cb(cached.ip ? announce.replace(host, cached.ip) : null)
+
+    dns.resolve4(host, function(err, ips) {
+        var ip = !err && ips && ips.length ? ips[0] : null
+        hosts[host] = { ip: ip, expires: Date.now() + (ip ? 10 * 60 * 1000 : 60 * 1000) }
+        cb(ip ? announce.replace(host, ip) : null)
+    })
+}
 
 function Tracker(url, opts, infoHash)
 {
@@ -13,9 +34,13 @@ function Tracker(url, opts, infoHash)
     this.run = function() {
         self.numRequests++
         
-        var client = new trackerCli(peerId, port, { infoHash: infoHash, announce: [url] })
-        client.start()
-        client.on('peer', function(addr) { self.emit('peer',addr) })
+        resolveAnnounce(url, function(announce) {
+            if (!announce) return
+
+            var client = new trackerCli(peerId, port, { infoHash: infoHash, announce: [announce] })
+            client.start()
+            client.on('peer', function(addr) { self.emit('peer',addr) })
+        })
     };
 
     this.pause = function() {
