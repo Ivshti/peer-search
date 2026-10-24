@@ -30,14 +30,16 @@ function Tracker(url, opts, infoHash)
     // TODO
     var peerId = new Buffer('01234567890123456789')
     var port = 6881
+    var client, closed
 
     this.run = function() {
         self.numRequests++
         
         resolveAnnounce(url, function(announce) {
-            if (!announce) return
+            if (!announce || closed) return
+            if (client) return client.update()
 
-            var client = new trackerCli(peerId, port, { infoHash: infoHash, announce: [announce] })
+            client = new trackerCli(peerId, port, { infoHash: infoHash, announce: [announce] })
             client.start()
             client.on('peer', function(addr) { self.emit('peer',addr) })
         })
@@ -45,6 +47,11 @@ function Tracker(url, opts, infoHash)
 
     this.pause = function() {
 
+    };
+
+    this.close = function() {
+        closed = true
+        if (client) client.destroy()
     };
 };
 Tracker.prototype.__proto__ = EventEmitter.prototype;
