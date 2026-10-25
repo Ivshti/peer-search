@@ -2,6 +2,9 @@
   "name": "peer-search",
   "version": "0.8.4",
   "description": "Find bittorrent peers intelligently",
+  "scripts": {
+    "test": "node test/dht.js"
+  },
   "dependencies": {
     "bittorrent-dht": "7.8.x",
     "bittorrent-tracker": "7.0.x"

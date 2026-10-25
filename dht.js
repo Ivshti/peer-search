@@ -11,21 +11,26 @@ function DHT(infoHash)
 	EventEmitter.call(this);
 	
 	var dht = new bittorrentDHT({ concurrency: DHT_CONCURRENCY });
-	var abort, wait;
+	var abort, wait, lookupId = 0;
 
 	this.run = function() {
 		if (abort || wait) return
 
 		wait = setTimeout(function() {
 			self.numRequests++
-			abort = dht.lookup(infoHash)
+			var id = ++lookupId, completed = false;
+			var cancel = dht.lookup(infoHash, function() {
+				completed = true;
+				if (lookupId === id) abort = null;
+			});
+			if (!completed) abort = cancel;
 			wait = null
 		}, DHT_WAIT);
 	};
 
 	this.pause = function() {
 		if (wait) { clearTimeout(wait); wait = null }
-		if (abort) { setTimeout(abort, DHT_LET_IT_RUN); abort = null }
+		if (abort) { lookupId++; setTimeout(abort, DHT_LET_IT_RUN); abort = null }
 	};
 
 	this.close = function(cb) {
