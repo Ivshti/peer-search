@@ -29,7 +29,7 @@ module.exports = function peerSearch(sources, swarm, options)
 				uniq[addr] = true
 			}
 			x.numFound++
-			swarm.add(addr)
+			if (addr[0] !== "[") swarm.add(addr)
 		});
 	});
 
